@@ -99,5 +99,6 @@ void    think(t_philosopher *philosopher);
 void	dinner_start(t_table *table);
 void    *check_death(void *data);
 void	increase_long(pthread_mutex_t *mutex, long *value);
-int	all_threads_are_running(pthread_mutex_t *mutex, long *threads, long nbr_philos);
-
+int		all_threads_are_running(pthread_mutex_t *mutex, long *threads, long nbr_philos);
+void	*only_philo(void *arg);
+void	clean(t_table *table);

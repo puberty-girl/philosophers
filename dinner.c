@@ -10,6 +10,7 @@ int	ready_check(pthread_mutex_t *mutex, int value)
 	return(ret);
 }
 
+
 void sync_threads(t_table *table)
 {
 	while(!ready_check(&table->table_mutex, table->ready))
@@ -45,7 +46,7 @@ void	dinner_start(t_table *table)
 	if (table->must_eat == 0)
 		return;
 	else if (table->nbr_of_philos == 1)
-		;//todo
+		thrd(&table->philosophers[0].therad_id, only_philo, &table->philosophers[0], CREATE);
 	else
 	{
 		while(i++ < table->nbr_of_philos)
@@ -63,6 +64,8 @@ void	dinner_start(t_table *table)
 	i = 0;
 	while (i++ < table->nbr_of_philos)
 		thrd(&table->philosophers[i].therad_id, NULL, NULL, JOIN);
-	
-
+	mtx(&table->table_mutex, LOCK);
+	table->stop = 1;
+	mtx(&table->table_mutex, UNLOCK);
+	thrd(&table->dead_checker, NULL, NULL, JOIN);
 }

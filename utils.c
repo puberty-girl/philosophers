@@ -101,3 +101,20 @@ void	increase_long(pthread_mutex_t *mutex, long *value)
 	(*value)++;
 	mtx(mutex, UNLOCK);
 }
+
+void	clean(t_table *table)
+{
+	t_philosopher	*philo;
+	int				i;
+
+	i = 0;
+	while (i++ < table->nbr_of_philos)
+	{
+		philo = table->philosophers + i;
+		mtx(&philo->philo_mutex, DESTROY);
+	}
+	mtx(&table->output_mutex, DESTROY);
+	mtx(&table->table_mutex, DESTROY);
+	free(table->forks);
+	free(table->philosophers);
+}
