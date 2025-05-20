@@ -6,23 +6,42 @@ void    eat(t_philosopher *philosopher)
     print_status(TAKING_FIRST_FORK, philosopher, 0);
     mtx(&philosopher->second_fork->fork, LOCK);
     print_status(TAKING_SECOND_FORK, philosopher, 0);
-
-	mtx(&philosopher->philo_mutex, LOCK);
-    philosopher->last_meal_time = get_time(MILLISECOND);
-    mtx(&philosopher->philo_mutex, UNLOCK);
-    philosopher->meals_consumed++;
+    
     print_status(EATING, philosopher, 0);
+    
     ft_usleep(philosopher->table->time_to_eat, philosopher->table);
+    
+    mtx(&philosopher->philo_mutex, LOCK);
+    philosopher->last_meal_time = get_time(MICROSECOND);
+    mtx(&philosopher->philo_mutex, UNLOCK);
+
+    mtx(&philosopher->philo_mutex, LOCK);
+    philosopher->meals_consumed++;
     if (philosopher->table->must_eat > 0
         && philosopher->meals_consumed == philosopher->table->must_eat)
         philosopher->isfull = 1;
+    mtx(&philosopher->philo_mutex, UNLOCK);
+    
     mtx(&philosopher->first_fork->fork, UNLOCK);
     mtx(&philosopher->second_fork->fork, UNLOCK);
 }
 
-void    think(t_philosopher *philosopher)
+void    think(t_philosopher *philosopher, int flag)
 {
-    print_status(THINKING, philosopher, 0);
+    long    time_sleep;
+    long    time_eat;
+    long    time_think;
+
+    if (!flag)
+        print_status(THINKING, philosopher, 0);
+    if (philosopher->table->nbr_of_philos % 2 == 0)
+        return;
+    time_eat = philosopher->table->time_to_eat;
+    time_sleep = philosopher->table->time_to_sleep;
+    time_think = time_eat * 2 - time_sleep;
+    if (time_think < 0)
+        time_think = 0;
+    ft_usleep(time_think * 0.5, philosopher->table);
 }
 
 void	*only_philo(void *arg)
@@ -31,13 +50,13 @@ void	*only_philo(void *arg)
 
 	philo = (t_philosopher *)arg;
 	sync_threads(philo->table);
-	mtx(&philo->philo_mutex, LOCK);
-	philo->last_meal_time = get_time(MILLISECOND);
-	mtx(&philo->philo_mutex, UNLOCK);
 	increase_long(&philo->table->table_mutex, &philo->table->nbr_of_threads);
+	mtx(&philo->first_fork->fork, LOCK);
 	print_status(TAKING_FIRST_FORK, philo, 0);
-	while(!ready_check(&philo->philo_mutex, philo->table->stop)) //maybe whitch to philo->table->mutex
-		usleep(200);
+	mtx(&philo->philo_mutex, LOCK);
+	philo->last_meal_time = get_time(MICROSECOND);
+	mtx(&philo->philo_mutex, UNLOCK);
+	ft_usleep(philo->table->time_to_die + 1, philo->table);
+	mtx(&philo->first_fork->fork, UNLOCK);
 	return (NULL);
-
 }

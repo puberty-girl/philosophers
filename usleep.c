@@ -18,7 +18,7 @@ void   ft_usleep(long usec, t_table *table)
         else
         {
             while(get_time(MICROSECOND) - start < usec)
-                ;
+                usleep(100);
         }
     }
 }

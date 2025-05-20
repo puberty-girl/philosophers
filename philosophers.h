@@ -95,7 +95,7 @@ int		ready_check(pthread_mutex_t *mutex, int value);
 void   	ft_usleep(long usec, t_table *table);
 void    print_status(t_status status, t_philosopher *philosopher, int debug);
 void    eat(t_philosopher *philosopher);
-void    think(t_philosopher *philosopher);
+void    think(t_philosopher *philosopher, int flag);
 void	dinner_start(t_table *table);
 void    *check_death(void *data);
 void	increase_long(pthread_mutex_t *mutex, long *value);

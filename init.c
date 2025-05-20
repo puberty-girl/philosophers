@@ -18,25 +18,25 @@ void	philo_init(t_table *table)
 {
 	int i;
 
-	i = -1;
-	while (i++ < table->nbr_of_philos)
+	i = 0;
+	while (i < table->nbr_of_philos)
 	{
-		table->philosophers[i].philo_id = i;
+		table->philosophers[i].philo_id = i + 1;
 		table->philosophers[i].isfull = 0;
 		table->philosophers[i].meals_consumed = 0;
 		table->philosophers[i].last_meal_time = 0;
 		table->philosophers[i].table = table;
 		mtx(&table->philosophers[i].philo_mutex, INIT);
 		assign_forks(&table->philosophers[i], table->forks, i);
+		i++;
 	}
-	
 }
 
 void    data_init(t_table *table)
 {
 	int	i;
 
-	i = -1;
+	i = 0;
 	table->stop = 0;
 	table->ready = 0;
 	table->nbr_of_threads = 0;
@@ -44,10 +44,11 @@ void    data_init(t_table *table)
 	table->forks = mlc(sizeof(t_fork) * table->nbr_of_philos);
 	mtx(&table->table_mutex, INIT);
 	mtx(&table->output_mutex, INIT);
-	while (i++ < table->nbr_of_philos)
+	while (i < table->nbr_of_philos)
 	{
 		mtx(&table->forks[i].fork, INIT);
 		table->forks[i].fork_id = i;
+		i++;
 	}
 	philo_init(table);
 }

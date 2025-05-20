@@ -108,10 +108,12 @@ void	clean(t_table *table)
 	int				i;
 
 	i = 0;
-	while (i++ < table->nbr_of_philos)
+	while (i < table->nbr_of_philos)
 	{
-		philo = table->philosophers + i;
+		philo = &table->philosophers[i];
 		mtx(&philo->philo_mutex, DESTROY);
+		mtx(&table->forks[i].fork, DESTROY);
+		i++;
 	}
 	mtx(&table->output_mutex, DESTROY);
 	mtx(&table->table_mutex, DESTROY);
