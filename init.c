@@ -1,8 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dvasilen <dvasilen@student.42.fr>          #+#  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025-05-20 17:19:22 by dvasilen          #+#    #+#             */
+/*   Updated: 2025-05-20 17:19:22 by dvasilen         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philosophers.h"
 
-void assign_forks(t_philosopher *philosopher, t_fork *forks, int ph_position)
+void	assign_forks(t_philosopher *philosopher, t_fork *forks, int ph_position)
 {
-	int philo_nbr;
+	int	philo_nbr;
 
 	philo_nbr = philosopher->table->nbr_of_philos;
 	philosopher->first_fork = &forks[(ph_position + 1) % philo_nbr];
@@ -12,11 +24,11 @@ void assign_forks(t_philosopher *philosopher, t_fork *forks, int ph_position)
 		philosopher->first_fork = &forks[ph_position];
 		philosopher->second_fork = &forks[(ph_position + 1) % philo_nbr];
 	}
-}					
+}
 
 void	philo_init(t_table *table)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (i < table->nbr_of_philos)
@@ -32,7 +44,7 @@ void	philo_init(t_table *table)
 	}
 }
 
-void    data_init(t_table *table)
+int	data_init(t_table *table)
 {
 	int	i;
 
@@ -40,7 +52,7 @@ void    data_init(t_table *table)
 	table->stop = 0;
 	table->ready = 0;
 	table->nbr_of_threads = 0;
-    table->philosophers = mlc(sizeof(t_philosopher) * table->nbr_of_philos);
+	table->philosophers = mlc(sizeof(t_philosopher) * table->nbr_of_philos);
 	table->forks = mlc(sizeof(t_fork) * table->nbr_of_philos);
 	mtx(&table->table_mutex, INIT);
 	mtx(&table->output_mutex, INIT);

@@ -12,7 +12,9 @@ SRCS = main.c \
        utils.c \
        usleep.c \
        output.c \
-       parsing.c
+       parsing.c \
+       utils2.c \
+       dinner2.c
 
 OBJS = $(SRCS:.c=.o)
 
