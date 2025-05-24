@@ -43,10 +43,15 @@ int	get_last_meal_and_check_full(t_philosopher *philosopher, long *last_meal)
 int	declare_death(t_philosopher *philosopher)
 {
 	mtx(&philosopher->table->table_mutex, LOCK);
-	philosopher->table->stop = 1;
+	if (philosopher->table->stop == 0)  // Only declare death if not already stopped
+	{
+		philosopher->table->stop = 1;
+		mtx(&philosopher->table->table_mutex, UNLOCK);
+		print_status(DIES, philosopher);
+		return (1);
+	}
 	mtx(&philosopher->table->table_mutex, UNLOCK);
-	print_status(DIES, philosopher);
-	return (1);
+	return (0);
 }
 
 int	isdead(t_philosopher *philosopher)
@@ -60,9 +65,7 @@ int	isdead(t_philosopher *philosopher)
 		return (0);
 	current_time = get_time(MICROSECOND);
 	elapsed = current_time - last_meal;
-	time_to_die = philosopher->table->time_to_die;
-	if (philosopher->table->time_to_eat > time_to_die && elapsed >= time_to_die)
-		return (declare_death(philosopher));
+	time_to_die = philosopher->table->time_to_die; // Already in microseconds
 	if (elapsed >= time_to_die)
 		return (declare_death(philosopher));
 	return (0);
@@ -76,7 +79,7 @@ void	*check_death(void *data)
 	table = (t_table *)data;
 	while (!all_threads_are_running(&table->table_mutex, &table->nbr_of_threads,
 			table->nbr_of_philos))
-		ft_usleep(50, table);
+		ft_usleep(500, table);
 	while (!ready_check(&table->table_mutex, table->stop))
 	{
 		i = 0;
@@ -87,7 +90,7 @@ void	*check_death(void *data)
 				return (NULL);
 			i++;
 		}
-		ft_usleep(50, table);
+		ft_usleep(500, table);
 	}
 	return (NULL);
 }

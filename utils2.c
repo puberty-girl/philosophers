@@ -12,17 +12,30 @@
 
 #include "philosophers.h"
 
-void	thrd(pthread_t *thread, void *(*foo)(void *),
-			void *data, t_opcode opcode)
+int	thrd(pthread_t *thread, void *(*start_routine)(void *), 
+			void *arg, t_opcode opcode)
 {
+	int	status;
+	pthread_attr_t attr;
+
 	if (opcode == CREATE)
-		thread_checker(pthread_create(thread, NULL, foo, data), opcode);
+	{
+		pthread_attr_init(&attr);
+		pthread_attr_setstacksize(&attr, 64 * 1024); // 64KB stack to avoid memory exhaustion
+		status = pthread_create(thread, &attr, start_routine, arg);
+		pthread_attr_destroy(&attr);
+	}
 	else if (opcode == JOIN)
-		thread_checker(pthread_join(*thread, NULL), opcode);
+		status = pthread_join(*thread, NULL);
 	else if (opcode == DETACH)
-		thread_checker(pthread_detach(*thread), opcode);
+		status = pthread_detach(*thread);
 	else
-		error_print("erong opcode for thread");
+	{
+		error_print("wrong opcode for thread");
+		return (1);
+	}
+	thread_checker(status, opcode);
+	return (status);
 }
 
 long	get_time(t_time_code time_code)
@@ -49,21 +62,53 @@ void	increase_long(pthread_mutex_t *mutex, long *value)
 	mtx(mutex, UNLOCK);
 }
 
+long	get_long(pthread_mutex_t *mutex, long *value)
+{
+	long	ret;
+
+	mtx(mutex, LOCK);
+	ret = *value;
+	mtx(mutex, UNLOCK);
+	return (ret);
+}
+
 void	clean(t_table *table)
 {
-	t_philosopher	*philo;
-	int				i;
+	int i;
 
-	i = 0;
-	while (i < table->nbr_of_philos)
+	if (!table)
+		return;
+
+	// Set stop flag to ensure all threads exit
+	if (mtx(&table->table_mutex, LOCK) == 0)
 	{
-		philo = &table->philosophers[i];
-		mtx(&philo->philo_mutex, DESTROY);
-		mtx(&table->forks[i].fork, DESTROY);
-		i++;
+		table->stop = 1;
+		mtx(&table->table_mutex, UNLOCK);
 	}
-	mtx(&table->output_mutex, DESTROY);
-	mtx(&table->table_mutex, DESTROY);
-	free(table->forks);
-	free(table->philosophers);
+
+	// Join philosopher threads if they were created and not joined
+	if (table->philosophers)
+	{
+		for (i = 0; i < table->nbr_of_philos; i++)
+		{
+			if (table->philosophers[i].therad_id && !table->philosophers[i].thread_joined)
+			{
+				thrd(&table->philosophers[i].therad_id, NULL, NULL, JOIN);
+				table->philosophers[i].thread_joined = 1;
+			}
+		}
+	}
+
+	// Join death checker if created and not joined
+	if (table->dead_checker && !table->death_checker_joined)
+	{
+		thrd(&table->dead_checker, NULL, NULL, JOIN);
+		table->death_checker_joined = 1;
+	}
+
+	// Free allocated memory
+	if (table->philosophers)
+		free(table->philosophers);
+	if (table->forks)
+		free(table->forks);
 }

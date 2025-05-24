@@ -70,6 +70,7 @@ typedef struct s_philosopher
 	pthread_t		therad_id;
 	pthread_mutex_t	philo_mutex;
 	t_table			*table;
+	int				thread_joined;
 }	t_philosopher;
 
 typedef struct s_table
@@ -83,6 +84,7 @@ typedef struct s_table
 	long			nbr_of_threads;
 	int				stop; // 1 or 0
 	int				ready; // 1 or 0
+	int				death_checker_joined;
 	t_fork			*forks;
 	t_philosopher	*philosophers;
 	pthread_t		dead_checker;
@@ -92,7 +94,7 @@ typedef struct s_table
 
 ////////////////	functions	//////
 
-void				error_print(const char *error);
+int					error_print(const char *error);
 int					parse_init(t_table *table, char **argv);
 int					data_init(t_table *table);
 void				philo_init(t_table *table);
@@ -121,3 +123,4 @@ void				thread_checker(int status, t_opcode opcode);
 void				*dinner_simulation(void *data);
 void				philosopher_loop(t_philosopher *philosopher);
 void				prepare_philosopher(t_philosopher *philosopher);
+long				get_long(pthread_mutex_t *mutex, long *value);

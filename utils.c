@@ -12,7 +12,7 @@
 
 #include "philosophers.h"
 
-void	error_print(const char *error)
+int	error_print(const char *error)
 {
 	printf("%s\n", error);
 	return (1);
@@ -36,7 +36,7 @@ void	mutex_checker(int status, t_opcode opcode)
 	if (status == 0)
 		return ;
 	if (status == EINVAL && (opcode == LOCK || opcode == UNLOCK))
-		error_print("invalid mutex value");
+		return ; // Silently ignore invalid mutex during cleanup
 	else if (status == EINVAL && opcode == INIT)
 		error_print("attr value is invalid");
 	else if (status == EDEADLK)
@@ -51,18 +51,25 @@ void	mutex_checker(int status, t_opcode opcode)
 		error_print("locked mutex");
 }
 
-void	mtx(pthread_mutex_t *mutex, t_opcode opcode)
+int	mtx(pthread_mutex_t *mutex, t_opcode opcode)
 {
+	int	status;
+
 	if (opcode == LOCK)
-		mutex_checker(pthread_mutex_lock(mutex), opcode);
+		status = pthread_mutex_lock(mutex);
 	else if (opcode == UNLOCK)
-		mutex_checker(pthread_mutex_unlock(mutex), opcode);
+		status = pthread_mutex_unlock(mutex);
 	else if (opcode == INIT)
-		mutex_checker(pthread_mutex_init(mutex, NULL), opcode);
+		status = pthread_mutex_init(mutex, NULL);
 	else if (opcode == DESTROY)
-		mutex_checker(pthread_mutex_destroy(mutex), opcode);
+		status = pthread_mutex_destroy(mutex);
 	else
+	{
 		error_print("wrong upcode");
+		return (1);
+	}
+	mutex_checker(status, opcode);
+	return (status);
 }
 
 void	thread_checker(int status, t_opcode opcode)

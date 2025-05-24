@@ -19,8 +19,11 @@ int	main(int argc, char **argv)
 	if (argc == 5 || argc == 6)
 	{
 		if (parse_init(&table, argv) != 0)
-			return (0);
-		if (data_init(&table) != 0);
+		{
+			clean(&table);
+			return (1);
+		}
+		if (data_init(&table) != 0)
 		{
 			clean(&table);
 			return (1);
@@ -35,5 +38,5 @@ int	main(int argc, char **argv)
 			" [number_of_times_each_philosopher_must_eat]\n");
 		return (1);
 	}
-	return(0);
+	return (0);
 }

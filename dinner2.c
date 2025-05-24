@@ -53,21 +53,29 @@ void	join_threads(t_table *table)
 	while (i < table->nbr_of_philos)
 	{
 		thrd(&table->philosophers[i].therad_id, NULL, NULL, JOIN);
+		table->philosophers[i].thread_joined = 1;
 		i++;
 	}
 }
 
+
 void	dinner_start(t_table *table)
 {
-	table->start_time = get_time(MICROSECOND);
-	start_threads(table);
-	thrd(&table->dead_checker, check_death, table, CREATE);
+	start_threads(table); // Сначала создаём ВСЕ потоки
+
+	table->start_time = get_time(MICROSECOND); // Только теперь фиксируем старт
+
 	mtx(&table->table_mutex, LOCK);
 	table->ready = 1;
 	mtx(&table->table_mutex, UNLOCK);
+
+	thrd(&table->dead_checker, check_death, table, CREATE);
 	join_threads(table);
+
 	mtx(&table->table_mutex, LOCK);
 	table->stop = 1;
 	mtx(&table->table_mutex, UNLOCK);
+
 	thrd(&table->dead_checker, NULL, NULL, JOIN);
+	table->death_checker_joined = 1;
 }
