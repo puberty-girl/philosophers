@@ -78,15 +78,11 @@ void	clean(t_table *table)
 
 	if (!table)
 		return;
-
-	// Set stop flag to ensure all threads exit
 	if (mtx(&table->table_mutex, LOCK) == 0)
 	{
 		table->stop = 1;
 		mtx(&table->table_mutex, UNLOCK);
 	}
-
-	// Join philosopher threads if they were created and not joined
 	if (table->philosophers)
 	{
 		for (i = 0; i < table->nbr_of_philos; i++)
@@ -98,15 +94,11 @@ void	clean(t_table *table)
 			}
 		}
 	}
-
-	// Join death checker if created and not joined
 	if (table->dead_checker && !table->death_checker_joined)
 	{
 		thrd(&table->dead_checker, NULL, NULL, JOIN);
 		table->death_checker_joined = 1;
 	}
-
-	// Free allocated memory
 	if (table->philosophers)
 		free(table->philosophers);
 	if (table->forks)

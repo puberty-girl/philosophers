@@ -34,7 +34,7 @@ void	print_status(t_status status, t_philosopher *philosopher)
 	else if (status == DIES)
 	{
 		printf("%-6ld %d died\n", elapsed, philosopher->philo_id);
-		fflush(stdout);  // Ensure the death message is printed immediately
+		fflush(stdout);
 	}
 	mtx(&philosopher->table->output_mutex, UNLOCK);
 }

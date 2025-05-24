@@ -36,7 +36,7 @@ void	mutex_checker(int status, t_opcode opcode)
 	if (status == 0)
 		return ;
 	if (status == EINVAL && (opcode == LOCK || opcode == UNLOCK))
-		return ; // Silently ignore invalid mutex during cleanup
+		return ;
 	else if (status == EINVAL && opcode == INIT)
 		error_print("attr value is invalid");
 	else if (status == EDEADLK)

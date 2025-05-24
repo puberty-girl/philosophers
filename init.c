@@ -80,7 +80,6 @@ int	data_init(t_table *table)
 	{
 		if (mtx(&table->forks[i].fork, INIT) != 0)
 		{
-			// Clean up previously initialized mutexes
 			while (--i >= 0)
 				mtx(&table->forks[i].fork, DESTROY);
 			mtx(&table->output_mutex, DESTROY);

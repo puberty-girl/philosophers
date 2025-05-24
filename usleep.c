@@ -21,6 +21,6 @@ void	ft_usleep(long usec, t_table *table)
 	{
 		if (get_time(MICROSECOND) - start >= usec)
 			break;
-		usleep(100); // Неблокирующее ожидание
+		usleep(100);
 	}
 }

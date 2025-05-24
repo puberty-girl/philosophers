@@ -43,7 +43,7 @@ int	get_last_meal_and_check_full(t_philosopher *philosopher, long *last_meal)
 int	declare_death(t_philosopher *philosopher)
 {
 	mtx(&philosopher->table->table_mutex, LOCK);
-	if (philosopher->table->stop == 0)  // Only declare death if not already stopped
+	if (philosopher->table->stop == 0)
 	{
 		philosopher->table->stop = 1;
 		mtx(&philosopher->table->table_mutex, UNLOCK);
@@ -65,7 +65,7 @@ int	isdead(t_philosopher *philosopher)
 		return (0);
 	current_time = get_time(MICROSECOND);
 	elapsed = current_time - last_meal;
-	time_to_die = philosopher->table->time_to_die; // Already in microseconds
+	time_to_die = philosopher->table->time_to_die;
 	if (elapsed >= time_to_die)
 		return (declare_death(philosopher));
 	return (0);
