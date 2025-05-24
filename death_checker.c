@@ -42,17 +42,21 @@ int	get_last_meal_and_check_full(t_philosopher *philosopher, long *last_meal)
 
 int	declare_death(t_philosopher *philosopher)
 {
+	int	should_print;
+
+	should_print = 0;
 	mtx(&philosopher->table->table_mutex, LOCK);
 	if (philosopher->table->stop == 0)
 	{
 		philosopher->table->stop = 1;
-		mtx(&philosopher->table->table_mutex, UNLOCK);
-		print_status(DIES, philosopher);
-		return (1);
+		should_print = 1;
 	}
 	mtx(&philosopher->table->table_mutex, UNLOCK);
-	return (0);
+	if (should_print)
+		print_status(DIES, philosopher);
+	return (should_print);
 }
+
 
 int	isdead(t_philosopher *philosopher)
 {

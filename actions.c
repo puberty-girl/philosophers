@@ -25,9 +25,6 @@ void	eat(t_philosopher *philosopher)
 	ft_usleep(philosopher->table->time_to_eat, philosopher->table);
 	mtx(&philosopher->philo_mutex, LOCK);
 	philosopher->meals_consumed++;
-	if (philosopher->table->must_eat > 0 &&
-		philosopher->meals_consumed == philosopher->table->must_eat)
-		philosopher->isfull = 1;
 	mtx(&philosopher->philo_mutex, UNLOCK);
 	mtx(&philosopher->first_fork->fork, UNLOCK);
 	mtx(&philosopher->second_fork->fork, UNLOCK);
