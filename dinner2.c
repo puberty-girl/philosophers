@@ -58,7 +58,6 @@ void	join_threads(t_table *table)
 	}
 }
 
-
 void	dinner_start(t_table *table)
 {
 	start_threads(table);

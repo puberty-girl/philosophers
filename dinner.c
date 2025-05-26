@@ -70,8 +70,8 @@ void	philosopher_loop(t_philosopher *philosopher)
 				philosopher->table->stop))
 			break ;
 		think(philosopher, 0);
-		if (philosopher->table->must_eat > 0 &&
-			philosopher->meals_consumed == philosopher->table->must_eat)
+		if (philosopher->table->must_eat > 0
+			&& philosopher->meals_consumed == philosopher->table->must_eat)
 		{
 			mtx(&philosopher->philo_mutex, LOCK);
 			philosopher->isfull = 1;

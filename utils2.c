@@ -12,30 +12,24 @@
 
 #include "philosophers.h"
 
-int	thrd(pthread_t *thread, void *(*start_routine)(void *), 
-			void *arg, t_opcode opcode)
+int	thrd(pthread_t *thread, void *(*start_routine)(void *),
+            void *arg, t_opcode opcode)
 {
-	int	status;
-	pthread_attr_t attr;
+    int	status;
 
-	if (opcode == CREATE)
-	{
-		pthread_attr_init(&attr);
-		pthread_attr_setstacksize(&attr, 64 * 1024); // 64KB stack to avoid memory exhaustion
-		status = pthread_create(thread, &attr, start_routine, arg);
-		pthread_attr_destroy(&attr);
-	}
-	else if (opcode == JOIN)
-		status = pthread_join(*thread, NULL);
-	else if (opcode == DETACH)
-		status = pthread_detach(*thread);
-	else
-	{
-		error_print("wrong opcode for thread");
-		return (1);
-	}
-	thread_checker(status, opcode);
-	return (status);
+    if (opcode == CREATE)
+        status = pthread_create(thread, NULL, start_routine, arg);
+    else if (opcode == JOIN)
+        status = pthread_join(*thread, NULL);
+    else if (opcode == DETACH)
+        status = pthread_detach(*thread);
+    else
+    {
+        error_print("wrong opcode for thread");
+        return (1);
+    }
+    thread_checker(status, opcode);
+    return (status);
 }
 
 long	get_time(t_time_code time_code)
@@ -70,37 +64,4 @@ long	get_long(pthread_mutex_t *mutex, long *value)
 	ret = *value;
 	mtx(mutex, UNLOCK);
 	return (ret);
-}
-
-void	clean(t_table *table)
-{
-	int i;
-
-	if (!table)
-		return;
-	if (mtx(&table->table_mutex, LOCK) == 0)
-	{
-		table->stop = 1;
-		mtx(&table->table_mutex, UNLOCK);
-	}
-	if (table->philosophers)
-	{
-		for (i = 0; i < table->nbr_of_philos; i++)
-		{
-			if (table->philosophers[i].therad_id && !table->philosophers[i].thread_joined)
-			{
-				thrd(&table->philosophers[i].therad_id, NULL, NULL, JOIN);
-				table->philosophers[i].thread_joined = 1;
-			}
-		}
-	}
-	if (table->dead_checker && !table->death_checker_joined)
-	{
-		thrd(&table->dead_checker, NULL, NULL, JOIN);
-		table->death_checker_joined = 1;
-	}
-	if (table->philosophers)
-		free(table->philosophers);
-	if (table->forks)
-		free(table->forks);
 }

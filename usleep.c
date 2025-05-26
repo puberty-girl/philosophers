@@ -20,7 +20,7 @@ void	ft_usleep(long usec, t_table *table)
 	while (!ready_check(&table->table_mutex, table->stop))
 	{
 		if (get_time(MICROSECOND) - start >= usec)
-			break;
+			break ;
 		usleep(100);
 	}
 }

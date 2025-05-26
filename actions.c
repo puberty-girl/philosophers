@@ -30,7 +30,6 @@ void	eat(t_philosopher *philosopher)
 	mtx(&philosopher->second_fork->fork, UNLOCK);
 }
 
-
 void	think(t_philosopher *philosopher, int flag)
 {
 	long	time_sleep;

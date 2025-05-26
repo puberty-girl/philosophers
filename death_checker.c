@@ -57,7 +57,6 @@ int	declare_death(t_philosopher *philosopher)
 	return (should_print);
 }
 
-
 int	isdead(t_philosopher *philosopher)
 {
 	long	elapsed;

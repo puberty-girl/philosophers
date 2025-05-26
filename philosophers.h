@@ -51,7 +51,7 @@ typedef enum e_status
 
 //////////////	structs		//////////////
 
-typedef struct s_table	t_table;
+// typedef struct s_table	t_table;
 
 typedef struct s_fork
 {
@@ -69,7 +69,7 @@ typedef struct s_philosopher
 	t_fork			*second_fork;
 	pthread_t		therad_id;
 	pthread_mutex_t	philo_mutex;
-	t_table			*table;
+	struct s_table	*table;
 	int				thread_joined;
 }	t_philosopher;
 
@@ -124,3 +124,4 @@ void				*dinner_simulation(void *data);
 void				philosopher_loop(t_philosopher *philosopher);
 void				prepare_philosopher(t_philosopher *philosopher);
 long				get_long(pthread_mutex_t *mutex, long *value);
+void				init_forks_destroy(t_table *t, int i);

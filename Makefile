@@ -1,7 +1,7 @@
 NAME = philo
 
 CC = cc
-CFLAGS = -fsanitize=address -g -Wall -Wextra -Werror -pthread
+CFLAGS = -Wall -Wextra -Werror -pthread -Ofast
 RM = rm -f
 
 SRCS = main.c \
@@ -14,7 +14,8 @@ SRCS = main.c \
        output.c \
        parsing.c \
        utils2.c \
-       dinner2.c
+       dinner2.c \
+       utils3.c
 
 OBJS = $(SRCS:.c=.o)
 

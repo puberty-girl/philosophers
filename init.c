@@ -46,51 +46,49 @@ void	philo_init(t_table *table)
 	table->death_checker_joined = 0;
 }
 
-int	data_init(t_table *table)
+static int	init_forks(t_table *t, int i)
 {
-	int	i;
+	if (i >= t->nbr_of_philos)
+		return (0);
+	if (mtx(&t->forks[i].fork, INIT) != 0)
+	{
+		if (i > 0)
+			init_forks_destroy(t, i - 1);
+		return (1);
+	}
+	t->forks[i].fork_id = i;
+	return (init_forks(t, i + 1));
+}
 
-	i = 0;
-	table->stop = 0;
-	table->ready = 0;
-	table->nbr_of_threads = 0;
-	table->philosophers = mlc(sizeof(t_philosopher) * table->nbr_of_philos);
-	if (!table->philosophers)
+void	init_forks_destroy(t_table *t, int i)
+{
+	if (i < 0)
+		return ;
+	mtx(&t->forks[i].fork, DESTROY);
+	init_forks_destroy(t, i - 1);
+}
+
+int	data_init(t_table *t)
+{
+	t->stop = 0;
+	t->ready = 0;
+	t->nbr_of_threads = 0;
+	t->philosophers = mlc(sizeof(t_philosopher) * t->nbr_of_philos);
+	if (!t->philosophers)
 		return (error_print("malloc error"));
-	table->forks = mlc(sizeof(t_fork) * table->nbr_of_philos);
-	if (!table->forks)
+	t->forks = mlc(sizeof(t_fork) * t->nbr_of_philos);
+	if (!t->forks)
+		return (free(t->philosophers), error_print("malloc error"));
+	if (mtx(&t->table_mutex, INIT) != 0
+		|| mtx(&t->output_mutex, INIT) != 0
+		|| init_forks(t, 0))
 	{
-		free(table->philosophers);
-		return (error_print("malloc error"));
-	}
-	if (mtx(&table->table_mutex, INIT) != 0)
-	{
-		free(table->philosophers);
-		free(table->forks);
+		mtx(&t->output_mutex, DESTROY);
+		mtx(&t->table_mutex, DESTROY);
+		free(t->philosophers);
+		free(t->forks);
 		return (error_print("mutex initialization error"));
 	}
-	if (mtx(&table->output_mutex, INIT) != 0)
-	{
-		mtx(&table->table_mutex, DESTROY);
-		free(table->philosophers);
-		free(table->forks);
-		return (error_print("mutex initialization error"));
-	}
-	while (i < table->nbr_of_philos)
-	{
-		if (mtx(&table->forks[i].fork, INIT) != 0)
-		{
-			while (--i >= 0)
-				mtx(&table->forks[i].fork, DESTROY);
-			mtx(&table->output_mutex, DESTROY);
-			mtx(&table->table_mutex, DESTROY);
-			free(table->philosophers);
-			free(table->forks);
-			return (error_print("mutex initialization error"));
-		}
-		table->forks[i].fork_id = i;
-		i++;
-	}
-	philo_init(table);
+	philo_init(t);
 	return (0);
 }
