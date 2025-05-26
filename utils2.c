@@ -13,23 +13,23 @@
 #include "philosophers.h"
 
 int	thrd(pthread_t *thread, void *(*start_routine)(void *),
-            void *arg, t_opcode opcode)
+			void *arg, t_opcode opcode)
 {
-    int	status;
+	int	status;
 
-    if (opcode == CREATE)
-        status = pthread_create(thread, NULL, start_routine, arg);
-    else if (opcode == JOIN)
-        status = pthread_join(*thread, NULL);
-    else if (opcode == DETACH)
-        status = pthread_detach(*thread);
-    else
-    {
-        error_print("wrong opcode for thread");
-        return (1);
-    }
-    thread_checker(status, opcode);
-    return (status);
+	if (opcode == CREATE)
+		status = pthread_create(thread, NULL, start_routine, arg);
+	else if (opcode == JOIN)
+		status = pthread_join(*thread, NULL);
+	else if (opcode == DETACH)
+		status = pthread_detach(*thread);
+	else
+	{
+		error_print("wrong opcode for thread");
+		return (1);
+	}
+	thread_checker(status, opcode);
+	return (status);
 }
 
 long	get_time(t_time_code time_code)

@@ -12,51 +12,26 @@
 
 #include "philosophers.h"
 
-// void	eat(t_philosopher *philosopher)
-// {
-// 	mtx(&philosopher->first_fork->fork, LOCK);
-// 	print_status(TAKING_FIRST_FORK, philosopher);
-// 	mtx(&philosopher->second_fork->fork, LOCK);
-// 	print_status(TAKING_SECOND_FORK, philosopher);
-// 	mtx(&philosopher->philo_mutex, LOCK);
-// 	philosopher->last_meal_time = get_time(MICROSECOND);
-// 	mtx(&philosopher->philo_mutex, UNLOCK);
-// 	print_status(EATING, philosopher);
-// 	ft_usleep(philosopher->table->time_to_eat, philosopher->table);
-// 	mtx(&philosopher->philo_mutex, LOCK);
-// 	philosopher->meals_consumed++;
-// 	mtx(&philosopher->philo_mutex, UNLOCK);
-// 	mtx(&philosopher->first_fork->fork, UNLOCK);
-// 	mtx(&philosopher->second_fork->fork, UNLOCK);
-// }
-void eat(t_philosopher *philo)
+void	eat(t_philosopher *philo)
 {
 	mtx(&philo->first_fork->fork, LOCK);
 	print_status(TAKING_FIRST_FORK, philo);
-
 	mtx(&philo->second_fork->fork, LOCK);
 	print_status(TAKING_SECOND_FORK, philo);
-
 	mtx(&philo->philo_mutex, LOCK);
 	philo->last_meal_time = get_time(MICROSECOND);
 	mtx(&philo->philo_mutex, UNLOCK);
-
 	print_status(EATING, philo);
-
-	// 🛠️ Moved fork release BEFORE sleep
 	mtx(&philo->second_fork->fork, UNLOCK);
 	mtx(&philo->first_fork->fork, UNLOCK);
-
-	ft_usleep(philo->table->time_to_eat, philo->table);  // 🧘 safe sleep
-
+	ft_usleep(philo->table->time_to_eat, philo->table);
 	mtx(&philo->philo_mutex, LOCK);
 	philo->meals_consumed++;
-	if (philo->table->must_eat > 0 && philo->meals_consumed == philo->table->must_eat)
+	if (philo->table->must_eat > 0
+		&& philo->meals_consumed == philo->table->must_eat)
 		philo->isfull = 1;
 	mtx(&philo->philo_mutex, UNLOCK);
 }
-
-
 
 void	think(t_philosopher *philosopher, int flag)
 {
