@@ -11,20 +11,24 @@
 /* ************************************************************************** */
 
 #include "philosophers.h"
-
 void	eat(t_philosopher *philo)
 {
 	mtx(&philo->first_fork->fork, LOCK);
 	print_status(TAKING_FIRST_FORK, philo);
 	mtx(&philo->second_fork->fork, LOCK);
 	print_status(TAKING_SECOND_FORK, philo);
+
+	// Set last_meal_time right before eating starts
 	mtx(&philo->philo_mutex, LOCK);
 	philo->last_meal_time = get_time(MICROSECOND);
 	mtx(&philo->philo_mutex, UNLOCK);
+
 	print_status(EATING, philo);
+	ft_usleep(philo->table->time_to_eat, philo->table); // simulate actual eating
+
 	mtx(&philo->second_fork->fork, UNLOCK);
 	mtx(&philo->first_fork->fork, UNLOCK);
-	ft_usleep(philo->table->time_to_eat, philo->table);
+
 	mtx(&philo->philo_mutex, LOCK);
 	philo->meals_consumed++;
 	if (philo->table->must_eat > 0
@@ -32,6 +36,7 @@ void	eat(t_philosopher *philo)
 		philo->isfull = 1;
 	mtx(&philo->philo_mutex, UNLOCK);
 }
+
 
 void	think(t_philosopher *philosopher, int flag)
 {

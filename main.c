@@ -16,6 +16,7 @@ int	main(int argc, char **argv)
 {
 	t_table	table;
 
+	memset(&table, 0, sizeof(t_table));
 	if (argc == 5 || argc == 6)
 	{
 		if (parse_init(&table, argv) != 0)

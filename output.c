@@ -33,8 +33,14 @@ void	print_status(t_status status, t_philosopher *philosopher)
 		printf("%-6ld %d is thinking\n", elapsed, philosopher->philo_id);
 	else if (status == DIES)
 	{
-		printf("%-6ld %d died\n", elapsed, philosopher->philo_id);
-		fflush(stdout);
+		// Protect double death print
+		static int printed = 0;
+		if (__sync_bool_compare_and_swap(&printed, 0, 1))
+		{
+			printf("%-6ld %d died\n", elapsed, philosopher->philo_id);
+			fflush(stdout);
+		}
 	}
+
 	mtx(&philosopher->table->output_mutex, UNLOCK);
 }
