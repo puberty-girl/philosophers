@@ -18,7 +18,7 @@ void	print_status(t_status status, t_philosopher *philosopher)
 
 	if (status != DIES && (philosopher->isfull
 			|| ready_check(&philosopher->table->table_mutex,
-				philosopher->table->stop)))
+				&philosopher->table->stop)))
 		return ;
 	elapsed = get_time(MICROSECOND) - philosopher->table->start_time;
 	elapsed /= 1000;

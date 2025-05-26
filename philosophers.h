@@ -106,7 +106,7 @@ int					thrd(pthread_t *thread,
 						void *(*foo)(void *), void *data, t_opcode opcode);
 void				sync_threads(t_table *table);
 long				get_time(t_time_code time_code);
-int					ready_check(pthread_mutex_t *mutex, int value);
+int					ready_check(pthread_mutex_t *mutex, int *value);
 void				ft_usleep(long usec, t_table *table);
 void				print_status(t_status status,
 						t_philosopher *philosopher);

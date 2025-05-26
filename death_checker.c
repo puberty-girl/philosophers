@@ -83,11 +83,11 @@ void	*check_death(void *data)
 	while (!all_threads_are_running(&table->table_mutex, &table->nbr_of_threads,
 			table->nbr_of_philos))
 		ft_usleep(500, table);
-	while (!ready_check(&table->table_mutex, table->stop))
+	while (!ready_check(&table->table_mutex, &table->stop))
 	{
 		i = 0;
 		while (i < table->nbr_of_philos
-			&& !ready_check(&table->table_mutex, table->stop))
+			&& !ready_check(&table->table_mutex, &table->stop))
 		{
 			if (isdead(&table->philosophers[i]))
 				return (NULL);
