@@ -58,18 +58,24 @@ void	join_threads(t_table *table)
 	}
 }
 
-void	dinner_start(t_table *table)
+void dinner_start(t_table *table)
 {
-	start_threads(table);
-	table->start_time = get_time(MICROSECOND);
+	table->start_time = get_time(MICROSECOND); // <- ✅ right here
+
 	mtx(&table->table_mutex, LOCK);
 	table->ready = 1;
 	mtx(&table->table_mutex, UNLOCK);
+
+	start_threads(table);
 	thrd(&table->dead_checker, check_death, table, CREATE);
 	join_threads(table);
+
 	mtx(&table->table_mutex, LOCK);
 	table->stop = 1;
 	mtx(&table->table_mutex, UNLOCK);
+
 	thrd(&table->dead_checker, NULL, NULL, JOIN);
 	table->death_checker_joined = 1;
 }
+
+
